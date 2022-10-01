@@ -1,77 +1,15 @@
 // Variables in .env and .env.defaults will be added to process.env
 const dotenv = require("dotenv");
 
-if (process.env.NODE_ENV === "production") {
-  dotenv.config({ path: ".env.prod" });
-} else if (process.env.NODE_ENV === "test") {
-  dotenv.config({ path: ".env.test" });
-} else {
-  dotenv.config({ path: ".env" });
-  dotenv.config({ path: ".env.defaults" });
-}
+dotenv.config({ path: ".env." + process.env.NODE_ENV });
+dotenv.config({ path: ".env.defaults" });
 
-const fs = require("fs");
-const selfsigned = require("selfsigned");
-const cors = require("cors");
 const HTMLWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 const webpack = require("webpack");
 const TerserJSPlugin = require("terser-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
-
-function createHTTPSConfig() {
-  // Generate certs for the local webpack-dev-server.
-  if (fs.existsSync(path.join(__dirname, "certs"))) {
-    const key = fs.readFileSync(path.join(__dirname, "certs", "key.pem"));
-    const cert = fs.readFileSync(path.join(__dirname, "certs", "cert.pem"));
-
-    return { key, cert };
-  } else {
-    const pems = selfsigned.generate(
-      [
-        {
-          name: "commonName",
-          value: "localhost"
-        }
-      ],
-      {
-        days: 365,
-        keySize: 2048,
-        algorithm: "sha256",
-        extensions: [
-          {
-            name: "subjectAltName",
-            altNames: [
-              {
-                type: 2,
-                value: "localhost"
-              },
-              {
-                type: 2,
-                value: "hubs.local"
-              }
-            ]
-          }
-        ]
-      }
-    );
-
-    fs.mkdirSync(path.join(__dirname, "certs"));
-    fs.writeFileSync(path.join(__dirname, "certs", "cert.pem"), pems.cert);
-    fs.writeFileSync(path.join(__dirname, "certs", "key.pem"), pems.private);
-
-    return {
-      key: pems.private,
-      cert: pems.cert
-    };
-  }
-}
-
-const defaultHostName = "hubs.local";
-const host = process.env.HOST_IP || defaultHostName;
-const port = process.env.HOST_PORT || 9090;
-const internalHostname = process.env.INTERNAL_HOSTNAME || defaultHostName;
 
 module.exports = env => {
   return {
@@ -82,26 +20,22 @@ module.exports = env => {
     devtool: process.env.NODE_ENV === "production" ? "source-map" : "inline-source-map",
 
     devServer: {
-      https: createHTTPSConfig(),
       historyApiFallback: true,
-      port,
-      host: process.env.HOST_IP || "0.0.0.0",
-      public: `${host}:${port}`,
-      publicPath: process.env.BASE_ASSETS_PATH || "",
+      port: 8080,
+      injectClient: false,
+      host: "0.0.0.0",
+      public: "localhost:8080",
+      publicPath: process.env.BASE_ASSETS_PATH,
       useLocalIp: true,
-      allowedHosts: [host, internalHostname],
+      allowedHosts: ["localhost"],
       headers: {
         "Access-Control-Allow-Origin": "*"
-      },
-      before: function(app) {
-        // be flexible with people accessing via a local reticulum on another port
-        app.use(cors({ origin: /hubs\.local(:\d*)?$/ }));
       }
     },
 
     output: {
       filename: "assets/js/[name]-[chunkhash].js",
-      publicPath: process.env.BASE_ASSETS_PATH || "/"
+      publicPath: process.env.BASE_ASSETS_PATH
     },
 
     module: {
@@ -255,20 +189,17 @@ module.exports = env => {
       }),
       new webpack.EnvironmentPlugin({
         BUILD_VERSION: "dev",
-        NODE_ENV: "development",
-        RETICULUM_SERVER: undefined,
-        THUMBNAIL_SERVER: "",
-        HUBS_SERVER: undefined,
-        CORS_PROXY_SERVER: null,
-        BASE_ASSETS_PATH: "",
-        NON_CORS_PROXY_DOMAINS: "",
-        ROUTER_BASE_PATH: "",
-        SENTRY_DSN: null,
-        GA_TRACKING_ID: null,
-        IS_MOZ: false,
-        GITHUB_ORG: "mozilla",
-        GITHUB_REPO: "spoke",
-        GITHUB_PUBLIC_TOKEN: "ghp_SAFEPB2zzes9TEpAOSx2McNjJLQ1GXLBES2FsfWU"
+        NODE_ENV: process.env.NODE_ENV,
+        RETICULUM_SERVER: process.env.RETICULUM_SERVER,
+        THUMBNAIL_SERVER: process.env.FARSPARK_SERVER,
+        HUBS_SERVER: process.env.HUBS_SERVER,
+        CORS_PROXY_SERVER: process.env.CORS_PROXY_SERVER,
+        BASE_ASSETS_PATH: process.env.BASE_ASSETS_PATH,
+        NON_CORS_PROXY_DOMAINS: process.env.NON_CORS_PROXY_DOMAINS,
+        ROUTER_BASE_PATH: process.env.ROUTER_BASE_PATH,
+        SENTRY_DSN: process.env.SENTRY_DSN,
+        GA_TRACKING_ID: process.env.GA_TRACKING_ID,
+        IS_MOZ: process.env.IS_MOZ
       })
     ]
   };

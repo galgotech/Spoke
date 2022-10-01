@@ -4,12 +4,7 @@ import editorIcon from "./assets/editor-icon.png";
 // Read configs from meta tags if available, otherwise use the process.env injected from build.
 const configs = {};
 const get = (configs, key, defaultValue) => {
-  const el = document.querySelector(`meta[name='env:${key.toLowerCase()}']`);
-  if (el) {
-    configs[key] = el.getAttribute("content");
-  } else {
-    configs[key] = defaultValue;
-  }
+  configs[key] = defaultValue;
 };
 
 get(configs, "HUBS_SERVER", process.env.HUBS_SERVER);

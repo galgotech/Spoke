@@ -15,7 +15,6 @@ import RedirectRoute from "./router/RedirectRoute";
 import { Telemetry } from "../telemetry";
 
 import LandingPage from "./landing/LandingPage";
-import WhatsNewPage from "./whats-new/WhatsNewPage";
 import LoginPage from "./auth/LoginPage";
 import LogoutPage from "./auth/LogoutPage";
 import ProjectsPage from "./projects/ProjectsPage";
@@ -74,7 +73,6 @@ export default class App extends Component {
                 <Switch>
                   {configs.isMoz() && <Route path="/" exact component={LandingPage} />}
                   {!configs.isMoz() && <RedirectRoute path="/" exact to="/projects" />}
-                  <Route path="/whats-new" exact component={WhatsNewPage} />
                   <RedirectRoute path="/new" exact to="/projects" />
                   <Route path="/login" exact component={LoginPage} />
                   <Route path="/logout" exact component={LogoutPage} />

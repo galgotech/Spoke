@@ -15,7 +15,6 @@ import { Button } from "../inputs/Button";
 import Footer from "../navigation/Footer";
 import { MediumButton } from "../inputs/Button";
 import { Link } from "react-router-dom";
-import LatestUpdate from "../whats-new/LatestUpdate";
 import { connectMenu, ContextMenu, MenuItem } from "../layout/ContextMenu";
 import styled from "styled-components";
 
@@ -150,22 +149,21 @@ class ProjectsPage extends Component {
       <>
         <NavBar />
         <main>
-          {!isAuthenticated || (projects.length === 0 && !loading) ? (
-            <ProjectsSection flex={0}>
-              <WelcomeContainer>
-                <h1>Welcome{configs.isMoz() ? " to Spoke" : ""}</h1>
-                <h2>
-                  If you&#39;re new here we recommend going through the tutorial. Otherwise, jump right in and create a
-                  project from scratch or from one of our templates.
-                </h2>
-                <MediumButton as={Link} to="/projects/tutorial">
-                  Start Tutorial
-                </MediumButton>
-              </WelcomeContainer>
-            </ProjectsSection>
-          ) : (
-            <LatestUpdate />
-          )}
+          {!isAuthenticated ||
+            (projects.length === 0 && !loading && (
+              <ProjectsSection flex={0}>
+                <WelcomeContainer>
+                  <h1>Welcome{configs.isMoz() ? " to Spoke" : ""}</h1>
+                  <h2>
+                    If you&#39;re new here we recommend going through the tutorial. Otherwise, jump right in and create
+                    a project from scratch or from one of our templates.
+                  </h2>
+                  <MediumButton as={Link} to="/projects/tutorial">
+                    Start Tutorial
+                  </MediumButton>
+                </WelcomeContainer>
+              </ProjectsSection>
+            ))}
           <ProjectsSection>
             <ProjectsContainer>
               <ProjectsHeader>
