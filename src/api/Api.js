@@ -1,8 +1,6 @@
 import configs from "../configs";
 import EventEmitter from "eventemitter3";
-import { Socket } from "phoenix";
-import uuid from "uuid/v4";
-import AuthContainer from "./AuthContainer";
+import Cookies from "js-cookie";
 import LoginDialog from "./LoginDialog";
 import PublishDialog from "./PublishDialog";
 import ProgressDialog from "../ui/dialogs/ProgressDialog";
@@ -89,9 +87,11 @@ function guessContentType(url) {
   return CommonKnownContentTypes[extension];
 }
 
-const LOCAL_STORE_KEY = "___hubs_store";
+const OAUTH_FLOW_CREDENTIALS_KEY = "ret-oauth-flow-account-credentials";
 
-export default class Project extends EventEmitter {
+const LOCAL_STORE_KEY = "___store";
+
+export default class Api extends EventEmitter {
   constructor() {
     super();
 
@@ -104,47 +104,12 @@ export default class Project extends EventEmitter {
 
     // Max size in MB
     this.maxUploadSize = 128;
-  }
 
-  getAuthContainer() {
-    return AuthContainer;
-  }
-
-  async authenticate(email, signal) {
-    const reticulumServer = RETICULUM_SERVER;
-    const socketUrl = `wss://${reticulumServer}/socket`;
-    const socket = new Socket(socketUrl, { params: { session_id: uuid() } });
-    socket.connect();
-
-    const channel = socket.channel(`auth:${uuid()}`);
-
-    const onAbort = () => socket.disconnect();
-
-    signal.addEventListener("abort", onAbort);
-
-    await new Promise((resolve, reject) =>
-      channel
-        .join()
-        .receive("ok", resolve)
-        .receive("error", err => {
-          signal.removeEventListener("abort", onAbort);
-          reject(err);
-        })
-    );
-
-    const authComplete = new Promise(resolve =>
-      channel.on("auth_credentials", ({ credentials: token }) => {
-        localStorage.setItem(LOCAL_STORE_KEY, JSON.stringify({ credentials: { email, token } }));
-        this.emit("authentication-changed", true);
-        resolve();
-      })
-    );
-
-    channel.push("auth_request", { email, origin: "spoke" });
-
-    signal.removeEventListener("abort", onAbort);
-
-    return authComplete;
+    const oauthFlowCredentials = Cookies.get(OAUTH_FLOW_CREDENTIALS_KEY);
+    if (oauthFlowCredentials) {
+      localStorage.setItem(LOCAL_STORE_KEY, JSON.stringify({ credentials: JSON.parse(oauthFlowCredentials) }));
+      Cookies.remove(OAUTH_FLOW_CREDENTIALS_KEY);
+    }
   }
 
   isAuthenticated() {
@@ -193,11 +158,8 @@ export default class Project extends EventEmitter {
   }
 
   async getProjects() {
-    const token = this.getToken();
-
     const headers = {
-      "content-type": "application/json",
-      authorization: `Bearer ${token}`
+      "content-type": "application/json"
     };
 
     const response = await this.fetch(`https://${RETICULUM_SERVER}/api/v1/projects`, { headers });
@@ -212,11 +174,8 @@ export default class Project extends EventEmitter {
   }
 
   async getProject(projectId) {
-    const token = this.getToken();
-
     const headers = {
-      "content-type": "application/json",
-      authorization: `Bearer ${token}`
+      "content-type": "application/json"
     };
 
     const response = await this.fetch(`https://${RETICULUM_SERVER}/api/v1/projects/${projectId}`, {
@@ -229,11 +188,8 @@ export default class Project extends EventEmitter {
   }
 
   async getProjectlessScenes() {
-    const token = this.getToken();
-
     const headers = {
-      "content-type": "application/json",
-      authorization: `Bearer ${token}`
+      "content-type": "application/json"
     };
 
     const response = await this.fetch(`https://${RETICULUM_SERVER}/api/v1/scenes/projectless`, { headers });
@@ -382,8 +338,6 @@ export default class Project extends EventEmitter {
 
     if (source === "assets") {
       searchParams.set("user", this.getAccountId());
-      const token = this.getToken();
-      headers.authorization = `Bearer ${token}`;
     }
 
     if (params.type) {
@@ -476,11 +430,8 @@ export default class Project extends EventEmitter {
       throw new Error("Save project aborted");
     }
 
-    const token = this.getToken();
-
     const headers = {
-      "content-type": "application/json",
-      authorization: `Bearer ${token}`
+      "content-type": "application/json"
     };
 
     const project = {
@@ -539,11 +490,8 @@ export default class Project extends EventEmitter {
   }
 
   async deleteProject(projectId) {
-    const token = this.getToken();
-
     const headers = {
-      "content-type": "application/json",
-      authorization: `Bearer ${token}`
+      "content-type": "application/json"
     };
 
     const projectEndpoint = `https://${RETICULUM_SERVER}/api/v1/projects/${projectId}`;
@@ -603,11 +551,8 @@ export default class Project extends EventEmitter {
       throw new Error("Save project aborted");
     }
 
-    const token = this.getToken();
-
     const headers = {
-      "content-type": "application/json",
-      authorization: `Bearer ${token}`
+      "content-type": "application/json"
     };
 
     const project = {
@@ -915,11 +860,8 @@ export default class Project extends EventEmitter {
         }
       };
 
-      const token = this.getToken();
-
       const headers = {
-        "content-type": "application/json",
-        authorization: `Bearer ${token}`
+        "content-type": "application/json"
       };
       const body = JSON.stringify({ scene: sceneParams });
 
@@ -996,8 +938,7 @@ export default class Project extends EventEmitter {
     }
 
     const headers = {
-      "content-type": "application/json",
-      authorization: `Bearer ${this.getToken()}`
+      "content-type": "application/json"
     };
 
     const sceneParams = {
@@ -1040,6 +981,8 @@ export default class Project extends EventEmitter {
       }
 
       request.open("post", `https://${uploadHost}:${uploadPort}/api/v1/media`, true);
+
+      request.setRequestHeader("Authorization", `Bearer ${this.getToken()}`);
 
       request.upload.addEventListener("progress", e => {
         if (onUploadProgress) {
@@ -1149,11 +1092,8 @@ export default class Project extends EventEmitter {
       await new Promise(resolve => setTimeout(resolve, 1100 - delta));
     }
 
-    const token = this.getToken();
-
     const headers = {
-      "content-type": "application/json",
-      authorization: `Bearer ${token}`
+      "content-type": "application/json"
     };
 
     const body = JSON.stringify({
@@ -1187,11 +1127,8 @@ export default class Project extends EventEmitter {
   }
 
   async deleteAsset(assetId) {
-    const token = this.getToken();
-
     const headers = {
-      "content-type": "application/json",
-      authorization: `Bearer ${token}`
+      "content-type": "application/json"
     };
 
     const assetEndpoint = `https://${RETICULUM_SERVER}/api/v1/assets/${assetId}`;
@@ -1210,11 +1147,8 @@ export default class Project extends EventEmitter {
   }
 
   async deleteProjectAsset(projectId, assetId) {
-    const token = this.getToken();
-
     const headers = {
-      "content-type": "application/json",
-      authorization: `Bearer ${token}`
+      "content-type": "application/json"
     };
 
     const projectAssetEndpoint = `https://${RETICULUM_SERVER}/api/v1/projects/${projectId}/assets/${assetId}`;
@@ -1242,6 +1176,19 @@ export default class Project extends EventEmitter {
 
   async fetch(url, options) {
     try {
+      const token = this.getToken();
+      if (!options) {
+        options = {};
+      }
+      if (!options.headers) {
+        options.headers = {};
+      }
+
+      options.headers = {
+        ...options.headers,
+        authorization: `Bearer ${token}`
+      };
+      console.log(options);
       const res = await fetch(url, options);
 
       if (res.ok) {

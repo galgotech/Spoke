@@ -90,7 +90,8 @@ export default function CreateProjectPage({ history, location }) {
 
   const { loading, error, entries, hasMore, loadMore } = usePaginatedSearch(
     `${api.apiURL}/api/v1/media/search`,
-    params
+    params,
+    { headers: { authorization: `Bearer ${api.getToken()}` } }
   );
 
   const filteredEntries = entries.map(result => ({
