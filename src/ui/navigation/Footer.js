@@ -1,8 +1,5 @@
 import React, { Component } from "react";
-import mozillaLogo from "../../assets/mozilla-logo.png";
 import styled from "styled-components";
-import configs from "../../configs";
-import { TERMS, PRIVACY } from "../../constants";
 
 const StyledFooter = styled.footer`
   display: flex;
@@ -39,71 +36,12 @@ const NavList = styled.ul`
   }
 `;
 
-const NavListItem = styled.li`
-  display: flex;
-  align-items: flex-end;
-  padding: 0 20px;
-  margin: 8px 0;
-
-  img {
-    width: 172px;
-    height: 49px;
-    vertical-align: baseline;
-  }
-
-  @media (min-width: 600px) {
-    margin: 0;
-    display: ${props => (props.mobileOnly ? "none" : "flex")};
-  }
-`;
-
 export default class Footer extends Component {
   render() {
     return (
       <StyledFooter>
         <nav>
-          <NavList>
-            <NavListItem mobileOnly>
-              <a href="https://github.com/mozilla/Spoke" rel="noopener noreferrer">
-                Source
-              </a>
-            </NavListItem>
-            {configs.isMoz() && (
-              <NavListItem mobileOnly>
-                <a href="https://discord.gg/wHmY4nd" rel="noopener noreferrer">
-                  Community
-                </a>
-              </NavListItem>
-            )}
-            {configs.isMoz() && (
-              <NavListItem mobileOnly>
-                <a href="https://hubs.mozilla.com" rel="noopener noreferrer">
-                  Hubs
-                </a>
-              </NavListItem>
-            )}
-            {configs.isMoz() && (
-              <NavListItem>
-                <a href={TERMS} rel="noopener noreferrer">
-                  Terms of Use
-                </a>
-              </NavListItem>
-            )}
-            {configs.isMoz() && (
-              <NavListItem>
-                <a href={PRIVACY} rel="noopener noreferrer">
-                  Privacy Notice
-                </a>
-              </NavListItem>
-            )}
-            {configs.isMoz() && (
-              <NavListItem>
-                <a href="https://mozilla.com" rel="noopener noreferrer">
-                  <img alt="Mozilla" src={mozillaLogo} />
-                </a>
-              </NavListItem>
-            )}
-          </NavList>
+          <NavList></NavList>
         </nav>
       </StyledFooter>
     );

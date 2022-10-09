@@ -1,5 +1,4 @@
 import PropTypes from "prop-types";
-import configs from "../../configs";
 import { withApi } from "../contexts/ApiContext";
 import NavBar from "../navigation/NavBar";
 import Footer from "../navigation/Footer";
@@ -10,7 +9,6 @@ import React, { useState, useCallback, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
 import StringInput from "../inputs/StringInput";
-import BooleanInput from "../inputs/BooleanInput";
 import FileInput from "../inputs/FileInput";
 import FormField from "../inputs/FormField";
 import { Button } from "../inputs/Button";
@@ -172,20 +170,6 @@ function CreateScenePage({ match, api }) {
     [sceneInfo, setSceneInfo]
   );
 
-  const onChangeAllowRemixing = useCallback(
-    allowRemixing => {
-      setSceneInfo({ ...sceneInfo, allowRemixing });
-    },
-    [sceneInfo, setSceneInfo]
-  );
-
-  const onChangeAllowPromotion = useCallback(
-    allowPromotion => {
-      setSceneInfo({ ...sceneInfo, allowPromotion });
-    },
-    [sceneInfo, setSceneInfo]
-  );
-
   const onChangeGlbFile = useCallback(
     ([file]) => {
       setGlbFile(file);
@@ -258,7 +242,7 @@ function CreateScenePage({ match, api }) {
   }
 
   const isNew = !sceneId;
-
+  const maxUploadSize = api.maxUploadSize;
   const content = isLoading ? (
     error ? (
       <ErrorMessage>{error}</ErrorMessage>
@@ -272,7 +256,7 @@ function CreateScenePage({ match, api }) {
 
         {sceneUrl && (
           <Button disabled={isUploading} onClick={openScene}>
-            {configs.isMoz() ? "Open in Hubs" : "Open Scene"}
+            Open Scene
           </Button>
         )}
       </SceneUploadHeader>
@@ -310,47 +294,10 @@ function CreateScenePage({ match, api }) {
               onChange={onChangeCreatorAttribution}
             />
           </FormField>
-          <FormField>
-            <FormField inline>
-              <label htmlFor="allowRemixing">
-                Allow{" "}
-                <a
-                  href="https://github.com/mozilla/Spoke/blob/master/REMIXING.md"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Remixing
-                </a>
-                &nbsp;with
-                <br />
-                Creative Commons&nbsp;
-                <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">
-                  CC-BY 3.0
-                </a>
-              </label>
-              <BooleanInput id="allowRemixing" value={sceneInfo.allowRemixing} onChange={onChangeAllowRemixing} />
-            </FormField>
-            <FormField inline>
-              <label htmlFor="allowPromotion">
-                Allow {configs.isMoz() ? "Mozilla to " : ""}
-                <a
-                  href="https://github.com/mozilla/Spoke/blob/master/PROMOTION.md"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {configs.isMoz() ? "promote" : "promotion"}
-                </a>{" "}
-                {configs.isMoz() ? "" : "of "}my scene
-              </label>
-              <BooleanInput id="allowPromotion" value={sceneInfo.allowPromotion} onChange={onChangeAllowPromotion} />
-            </FormField>
-          </FormField>
 
           <FormField>
             <FileInput
-              label={`${isNew ? "Select scene model file" : "Replace scene model file"} (max ${
-                api.maxUploadSize
-              }mb .glb)`}
+              label={`${isNew ? "Select scene model file" : "Replace scene model file"} (max ${maxUploadSize}mb .glb)`}
               id="glbFile"
               type="file"
               required={isNew}

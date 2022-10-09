@@ -153,7 +153,7 @@ class ProjectsPage extends Component {
             (projects.length === 0 && !loading && (
               <ProjectsSection flex={0}>
                 <WelcomeContainer>
-                  <h1>Welcome{configs.isMoz() ? " to Spoke" : ""}</h1>
+                  <h1>Welcome</h1>
                   <h2>
                     If you&#39;re new here we recommend going through the tutorial. Otherwise, jump right in and create
                     a project from scratch or from one of our templates.

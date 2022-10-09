@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import configs from "../../configs";
 import NodeEditor from "./NodeEditor";
 import InputGroup from "../inputs/InputGroup";
 import StringInput from "../inputs/StringInput";
@@ -14,7 +13,7 @@ export default class LinkNodeEditor extends Component {
 
   static iconComponent = Link;
 
-  static description = `Link to a ${configs.isMoz() ? "Hubs " : ""}room or a website.`;
+  static description = `Link to a room or a website.`;
 
   onChangeHref = href => {
     this.props.editor.setPropertySelected("href", href);

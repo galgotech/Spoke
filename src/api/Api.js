@@ -89,7 +89,7 @@ function guessContentType(url) {
 
 const OAUTH_FLOW_CREDENTIALS_KEY = "ret-oauth-flow-account-credentials";
 
-const LOCAL_STORE_KEY = "___store";
+const LOCAL_STORE_KEY = "___store_scene_creator";
 
 export default class Api extends EventEmitter {
   constructor() {
@@ -110,7 +110,28 @@ export default class Api extends EventEmitter {
       localStorage.setItem(LOCAL_STORE_KEY, JSON.stringify({ credentials: JSON.parse(oauthFlowCredentials) }));
       Cookies.remove(OAUTH_FLOW_CREDENTIALS_KEY);
     }
+
+    this._refreshAccesstoken();
   }
+
+  _refreshAccesstoken = () => {
+    const interval = 3 * 60 * 1000;
+    const store = JSON.parse(localStorage.getItem(LOCAL_STORE_KEY));
+    if (!store.credentials.token) return;
+
+    const refreshToken = async () => {
+      const store = JSON.parse(localStorage.getItem(LOCAL_STORE_KEY));
+      const data = await this.fetchBackend(configs.BACKEND_ENDPOINT_REFRESH_ACCESS_TOKEN, {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${store.credentials.refreshToken}`
+        }
+      });
+      localStorage.setItem(LOCAL_STORE_KEY, JSON.stringify({ credentials: await data.json() }));
+      setTimeout(refreshToken, interval);
+    };
+    setTimeout(refreshToken, interval);
+  };
 
   isAuthenticated() {
     const value = localStorage.getItem(LOCAL_STORE_KEY);
@@ -1174,6 +1195,10 @@ export default class Api extends EventEmitter {
     return JSON.parse(localStorage.getItem("spoke-user-info"));
   }
 
+  async fetchBackend(url, options) {
+    return await this.fetch(`${configs.BACKEND_SERVER}${url}`, options);
+  }
+
   async fetch(url, options) {
     try {
       const token = this.getToken();
@@ -1184,11 +1209,11 @@ export default class Api extends EventEmitter {
         options.headers = {};
       }
 
+      const authorization = options.headers.authorization || `Bearer ${token}`;
       options.headers = {
         ...options.headers,
-        authorization: `Bearer ${token}`
+        authorization
       };
-      console.log(options);
       const res = await fetch(url, options);
 
       if (res.ok) {

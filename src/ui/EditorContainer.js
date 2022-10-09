@@ -31,7 +31,6 @@ import SaveNewProjectDialog from "./dialogs/SaveNewProjectDialog";
 import ExportProjectDialog from "./dialogs/ExportProjectDialog";
 
 import Onboarding from "./onboarding/Onboarding";
-import SupportDialog from "./dialogs/SupportDialog";
 import { cmdOrCtrlString } from "./utils";
 import BrowserPrompt from "./router/BrowserPrompt";
 import { Resizeable } from "./layout/Resizeable";
@@ -40,8 +39,6 @@ import Editor from "../editor/Editor";
 
 import defaultTemplateUrl from "./../assets/templates/crater.spoke";
 import tutorialTemplateUrl from "./../assets/templates/tutorial.spoke";
-
-import { TERMS, PRIVACY } from "../constants";
 
 const StyledEditorContainer = styled.div`
   display: flex;
@@ -356,7 +353,7 @@ class EditorContainer extends Component {
             action: this.onDuplicateProject
           },
           {
-            name: configs.isMoz() ? "Publish to Hubs..." : "Publish Scene...",
+            name: "Publish Scene...",
             action: this.onPublishProject
           },
           {
@@ -370,52 +367,6 @@ class EditorContainer extends Component {
           {
             name: "Export legacy .spoke project",
             action: this.onExportLegacyProject
-          }
-        ]
-      },
-      {
-        name: "Help",
-        items: [
-          {
-            name: "Tutorial",
-            action: () => {
-              const { projectId } = this.props.match.params;
-
-              if (projectId === "tutorial") {
-                trackEvent("Tutorial Start");
-                this.setState({ onboardingContext: { enabled: true } });
-              } else {
-                this.props.history.push("/projects/tutorial");
-              }
-            }
-          },
-          {
-            name: "Keyboard and Mouse Controls",
-            action: () => window.open("https://hubs.mozilla.com/docs/spoke-controls.html")
-          },
-          {
-            name: "Get Support",
-            action: () => this.showDialog(SupportDialog)
-          },
-          {
-            name: "Submit Feedback",
-            action: () => window.open("https://forms.gle/2PAFXKwW1SXdfSK17")
-          },
-          {
-            name: "Report an Issue",
-            action: () => window.open("https://github.com/mozilla/Spoke/issues/new")
-          },
-          {
-            name: "Join us on Discord",
-            action: () => window.open("https://discord.gg/wHmY4nd")
-          },
-          {
-            name: "Terms of Use",
-            action: () => window.open(TERMS)
-          },
-          {
-            name: "Privacy Notice",
-            action: () => window.open(PRIVACY)
           }
         ]
       },

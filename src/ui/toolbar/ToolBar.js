@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import configs from "../../configs";
 import { showMenu, ContextMenu, MenuItem, SubMenu } from "../layout/ContextMenu";
 import ToolButton from "./ToolButton";
 import { Button } from "../inputs/Button";
@@ -482,13 +481,9 @@ export default class ToolBar extends Component {
           )}
         </ToolToggles>
         <Spacer />
-        {this.props.isPublishedScene && (
-          <PublishButton onClick={this.props.onOpenScene}>
-            {configs.isMoz() ? "Open in Hubs" : "Open Scene"}
-          </PublishButton>
-        )}
+        {this.props.isPublishedScene && <PublishButton onClick={this.props.onOpenScene}>Open Scene</PublishButton>}
         <PublishButton id="publish-button" onClick={this.props.onPublish}>
-          {configs.isMoz() ? "Publish to Hubs..." : "Publish Scene..."}
+          Publish Scene...
         </PublishButton>
         <ContextMenu id="menu">
           {this.props.menu.map(menu => {

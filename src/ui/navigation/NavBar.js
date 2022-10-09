@@ -72,27 +72,7 @@ class NavBar extends Component {
         </IconContainer>
         <MiddleContainer>
           <nav>
-            <NavList>
-              <li>
-                <a href="https://github.com/mozilla/Spoke" rel="noopener noreferrer">
-                  Source
-                </a>
-              </li>
-              {configs.isMoz() && (
-                <li>
-                  <a href="https://discord.gg/wHmY4nd" rel="noopener noreferrer">
-                    Community
-                  </a>
-                </li>
-              )}
-              {configs.isMoz() && (
-                <li>
-                  <a href="https://hubs.mozilla.com" rel="noopener noreferrer">
-                    Hubs
-                  </a>
-                </li>
-              )}
-            </NavList>
+            <NavList></NavList>
           </nav>
         </MiddleContainer>
         <RightContainer>

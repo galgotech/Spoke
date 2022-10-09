@@ -199,7 +199,11 @@ module.exports = env => {
         ROUTER_BASE_PATH: process.env.ROUTER_BASE_PATH,
         SENTRY_DSN: process.env.SENTRY_DSN,
         GA_TRACKING_ID: process.env.GA_TRACKING_ID,
-        IS_MOZ: process.env.IS_MOZ
+        IS_MOZ: process.env.IS_MOZ,
+
+        BACKEND_SERVER: process.env.BACKEND_SERVER,
+        BACKEND_ENDPOINT_PERMISSIONS: process.env.BACKEND_ENDPOINT_PERMISSIONS,
+        BACKEND_ENDPOINT_REFRESH_ACCESS_TOKEN: process.env.BACKEND_ENDPOINT_REFRESH_ACCESS_TOKEN
       })
     ]
   };

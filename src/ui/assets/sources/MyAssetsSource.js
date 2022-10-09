@@ -6,7 +6,6 @@ import VideoNode from "../../../editor/nodes/VideoNode";
 import ImageNode from "../../../editor/nodes/ImageNode";
 import AudioNode from "../../../editor/nodes/AudioNode";
 import { AcceptsAllFileTypes } from "../fileTypes";
-import { PRIVACY } from "../../../constants";
 
 const assetTypeToNode = {
   model: ModelNode,
@@ -36,7 +35,6 @@ export default class MyAssetsSource extends BaseSource {
       { label: "Audio", value: "audio" }
     ];
     this.searchLegalCopy = "Search by Mozilla Hubs";
-    this.privacyPolicyUrl = PRIVACY;
     this.uploadSource = true;
     this.uploadMultiple = true;
     this.acceptFileTypes = AcceptsAllFileTypes;

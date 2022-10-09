@@ -1,4 +1,3 @@
-import spokeIcon from "./assets/spoke-icon.png";
 import editorIcon from "./assets/editor-icon.png";
 
 // Read configs from meta tags if available, otherwise use the process.env injected from build.
@@ -16,6 +15,10 @@ get(configs, "SENTRY_DSN", process.env.SENTRY_DSN);
 get(configs, "GA_TRACKING_ID", process.env.GA_TRACKING_ID);
 get(configs, "BASE_ASSETS_PATH", process.env.BASE_ASSETS_PATH);
 get(configs, "IS_MOZ", process.env.IS_MOZ);
+
+get(configs, "BACKEND_SERVER", process.env.BACKEND_SERVER);
+get(configs, "BACKEND_ENDPOINT_PERMISSIONS", process.env.BACKEND_ENDPOINT_PERMISSIONS);
+get(configs, "BACKEND_ENDPOINT_REFRESH_ACCESS_TOKEN", process.env.BACKEND_ENDPOINT_REFRESH_ACCESS_TOKEN);
 
 if (configs.BASE_ASSETS_PATH) {
   // eslint-disable-next-line no-undef
@@ -37,9 +40,8 @@ function fixBaseAssetsPath(path) {
   return path;
 }
 
-configs.isMoz = () => configs.IS_MOZ === "true";
-configs.name = () => (configs.isMoz() ? "Spoke" : "Scene Editor");
-configs.longName = () => (configs.isMoz() ? "Spoke by Mozilla" : "Scene Editor");
-configs.icon = () => (configs.isMoz() ? fixBaseAssetsPath(spokeIcon) : fixBaseAssetsPath(editorIcon));
+configs.name = () => "Scene Editor";
+configs.longName = () => "Scene Editor";
+configs.icon = () => fixBaseAssetsPath(editorIcon);
 
 export default configs;

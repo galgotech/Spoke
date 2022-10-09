@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import configs from "../configs";
 import PreviewDialog from "../ui/dialogs/PreviewDialog";
 import StringInput from "../ui/inputs/StringInput";
-import BooleanInput from "../ui/inputs/BooleanInput";
 import FormField from "../ui/inputs/FormField";
 
 export default class PublishDialog extends Component {
@@ -33,10 +31,6 @@ export default class PublishDialog extends Component {
 
   onChangeCreatorAttribution = creatorAttribution => this.setState({ creatorAttribution });
 
-  onChangeAllowRemixing = allowRemixing => this.setState({ allowRemixing });
-
-  onChangeAllowPromotion = allowPromotion => this.setState({ allowPromotion });
-
   onConfirm = () => {
     const publishState = { ...this.state, contentAttributions: this.props.contentAttributions };
     publishState.name = publishState.name.trim();
@@ -46,12 +40,12 @@ export default class PublishDialog extends Component {
 
   render() {
     const { onCancel, screenshotUrl, contentAttributions } = this.props;
-    const { creatorAttribution, name, allowRemixing, allowPromotion } = this.state;
+    const { creatorAttribution, name } = this.state;
 
     return (
       <PreviewDialog
         imageSrc={screenshotUrl}
-        title={configs.isMoz() ? "Publish to Hubs" : "Publish Scene"}
+        title="Publish Scene"
         onConfirm={this.onConfirm}
         onCancel={onCancel}
         confirmLabel="Save and Publish"
@@ -70,39 +64,6 @@ export default class PublishDialog extends Component {
         <FormField>
           <label htmlFor="creatorAttribution">Your Attribution (optional):</label>
           <StringInput id="creatorAttribution" value={creatorAttribution} onChange={this.onChangeCreatorAttribution} />
-        </FormField>
-        <FormField inline>
-          <label htmlFor="allowRemixing">
-            Allow{" "}
-            <a
-              href="https://github.com/mozilla/Spoke/blob/master/REMIXING.md"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Remixing
-            </a>
-            &nbsp;with
-            <br />
-            Creative Commons&nbsp;
-            <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">
-              CC-BY 3.0
-            </a>
-          </label>
-          <BooleanInput id="allowRemixing" value={allowRemixing} onChange={this.onChangeAllowRemixing} />
-        </FormField>
-        <FormField inline>
-          <label htmlFor="allowPromotion">
-            Allow {configs.isMoz() ? "Mozilla to " : ""}
-            <a
-              href="https://github.com/mozilla/Spoke/blob/master/PROMOTION.md"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {configs.isMoz() ? "promote" : "promotion"}
-            </a>{" "}
-            {configs.isMoz() ? "" : "of "}my scene
-          </label>
-          <BooleanInput id="allowPromotion" value={allowPromotion} onChange={this.onChangeAllowPromotion} />
         </FormField>
         {contentAttributions && (
           <FormField>
