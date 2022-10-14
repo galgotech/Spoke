@@ -108,7 +108,7 @@ export default class Api extends EventEmitter {
     const oauthFlowCredentials = Cookies.get(OAUTH_FLOW_CREDENTIALS_KEY);
     if (oauthFlowCredentials) {
       localStorage.setItem(LOCAL_STORE_KEY, JSON.stringify({ credentials: JSON.parse(oauthFlowCredentials) }));
-      // Cookies.remove(OAUTH_FLOW_CREDENTIALS_KEY);
+      Cookies.remove(OAUTH_FLOW_CREDENTIALS_KEY);
     }
 
     this._refreshAccesstoken();
